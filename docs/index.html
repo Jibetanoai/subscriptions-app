@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>サブスク管理</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#3b6cf6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="サブスク管理">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="app-header">
+  <h1>サブスク・定期購入管理</h1>
+  <div class="header-actions">
+    <button id="chartBtn" class="btn">📈 支出の推移</button>
+    <button id="addBtn" class="btn btn-primary">＋ 追加</button>
+  </div>
+</header>
+
+<div id="summaryBar" class="summary-bar"></div>
+<div id="reminderBanner" class="reminder-banner" hidden></div>
+<div id="trialBanner" class="trial-banner" hidden></div>
+
+<nav class="tabs" id="tabs">
+  <button class="tab active" data-cat="all">すべて</button>
+  <button class="tab" data-cat="streaming">🎬 動画配信</button>
+  <button class="tab" data-cat="music">🎵 音楽</button>
+  <button class="tab" data-cat="software">💻 ソフト・アプリ</button>
+  <button class="tab" data-cat="fitness">💪 ジム・フィットネス</button>
+  <button class="tab" data-cat="food">📦 食品・宅配</button>
+  <button class="tab" data-cat="other">その他</button>
+</nav>
+
+<main>
+  <div id="emptyState" class="empty-state" hidden>
+    まだサブスクが登録されてないよ。「＋ 追加」から登録してみて。
+  </div>
+  <div id="cardGrid" class="card-grid"></div>
+</main>
+
+<div id="chartOverlay" class="modal-overlay" hidden>
+  <div class="modal chart-modal">
+    <div class="modal-header">
+      <h2>📈 支出の推移</h2>
+      <button id="closeChart" class="icon-btn" aria-label="閉じる">×</button>
+    </div>
+    <div id="chartContent"></div>
+  </div>
+</div>
+
+<div id="modalOverlay" class="modal-overlay" hidden>
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">サブスクを追加</h2>
+      <button id="closeModal" class="icon-btn" aria-label="閉じる">×</button>
+    </div>
+    <form id="subForm">
+      <input type="hidden" id="subId">
+
+      <label>種類
+        <select id="category" required>
+          <option value="streaming">🎬 動画配信</option>
+          <option value="music">🎵 音楽</option>
+          <option value="software">💻 ソフト・アプリ</option>
+          <option value="fitness">💪 ジム・フィットネス</option>
+          <option value="food">📦 食品・宅配</option>
+          <option value="other">その他</option>
+        </select>
+      </label>
+
+      <label id="categoryLabelWrap" hidden>種類の名前(その他を選んだ場合)
+        <input type="text" id="category_label" placeholder="例: 電子書籍読み放題">
+      </label>
+
+      <label>サービス名 <span class="required">*</span>
+        <input type="text" id="service_name" required placeholder="例: Netflix">
+      </label>
+
+      <label>プラン名
+        <input type="text" id="plan_name" placeholder="例: プレミアムプラン">
+      </label>
+
+      <div class="form-row">
+        <label>料金(円)
+          <input type="number" id="cost" min="0" placeholder="例: 1980">
+        </label>
+        <label>支払いサイクル
+          <select id="billing_cycle">
+            <option value="monthly">月払い</option>
+            <option value="yearly">年払い</option>
+            <option value="weekly">週払い</option>
+          </select>
+        </label>
+      </div>
+
+      <label>次回請求日
+        <input type="date" id="next_billing_date">
+      </label>
+
+      <label class="trial-field">無料トライアル終了日(あれば)
+        <input type="date" id="trial_end_date">
+      </label>
+
+      <label>支払い方法
+        <input type="text" id="payment_method" placeholder="例: 楽天カード">
+      </label>
+
+      <fieldset>
+        <legend>解約情報</legend>
+        <label>解約ページURL
+          <input type="url" id="cancel_url" placeholder="https://...">
+        </label>
+        <label>解約方法メモ
+          <textarea id="cancel_note" rows="2" placeholder="例: アプリからは解約できない、Web版から解約手続き"></textarea>
+        </label>
+      </fieldset>
+
+      <label>その他メモ
+        <textarea id="memo" rows="2"></textarea>
+      </label>
+
+      <div class="modal-footer">
+        <button type="button" id="deleteBtn" class="btn btn-danger" hidden>削除</button>
+        <div class="spacer"></div>
+        <button type="button" id="cancelBtn" class="btn">キャンセル</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="storage.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
