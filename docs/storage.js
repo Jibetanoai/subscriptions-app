@@ -38,6 +38,16 @@ const Storage = (() => {
     return n;
   }
 
+  // toISOString()はUTC基準のため、日本時間の深夜0時〜朝9時台に日付が1日ズレる。
+  // 履歴の日付には必ずこちらの端末ローカル日付を使う。
+  function localDateStr() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
   return {
     async list() {
       return loadLocal().slice().sort((a, b) => {
@@ -53,7 +63,7 @@ const Storage = (() => {
       const norm = normalize(data);
       const history = [];
       if (norm.cost != null) {
-        history.push({ date: now.slice(0, 10), amount: norm.cost, billing_cycle: norm.billing_cycle });
+        history.push({ date: localDateStr(), amount: norm.cost, billing_cycle: norm.billing_cycle });
       }
       const row = { id: nextId(), ...norm, cost_history: history, created_at: now, updated_at: now };
       list.push(row);
@@ -67,7 +77,7 @@ const Storage = (() => {
       const prev = list[idx];
       const norm = normalize(data);
       const history = Array.isArray(prev.cost_history) ? prev.cost_history.slice() : [];
-      const today = new Date().toISOString().slice(0, 10);
+      const today = localDateStr();
       const last = history[history.length - 1];
       if (norm.cost != null && (!last || last.amount !== norm.cost || last.billing_cycle !== norm.billing_cycle)) {
         const entry = { date: today, amount: norm.cost, billing_cycle: norm.billing_cycle };
